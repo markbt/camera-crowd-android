@@ -69,10 +69,15 @@ public class CaptureActivity extends ActionBarActivity {
         mCamera = getCameraInstance();
 
         // Create our Preview view and set it as the content of our activity.
-        FrameLayout mFrame = (FrameLayout) findViewById(R.id.camera_preview);
+        final FrameLayout mFrame = (FrameLayout) findViewById(R.id.camera_preview);
         mPreview = new CameraPreview(this, this, mCamera, mFrame);
 
-        mFrame.addView(mPreview);
+        mFrame.post(new Runnable() {
+
+            public void run() {
+                mFrame.addView(mPreview);
+            }
+        });
 
         // Add a listener to the Capture button
         Button captureButton = (Button) findViewById(R.id.capture);

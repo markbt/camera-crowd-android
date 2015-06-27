@@ -5,9 +5,12 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,40 +20,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private FrameLayout mFrame;
     private CaptureActivity mActivity;
-
-    private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
-        final double ASPECT_TOLERANCE = 0.05;
-        double targetRatio = (double) w/h;
-
-        if (sizes==null) return null;
-
-        Size optimalSize = null;
-
-        double minDiff = Double.MAX_VALUE;
-
-        int targetHeight = h;
-
-        // Find size
-        for (Size size : sizes) {
-            double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
-                optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
-            }
-        }
-
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
-            }
-        }
-        return optimalSize;
-    }
 
     public CameraPreview(Context context, CaptureActivity activity, Camera camera, FrameLayout frame) {
         super(context);
@@ -80,17 +49,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         //portrait
         //float ratio = (float)size.height/size.width;
+        Log.d("=======MBT==>", "old:" + size.width + " x " + size.height);
 
-        int new_width=0, new_height=0;
-        if(mFrame.getWidth()/mFrame.getHeight()<ratio){
-            new_width = Math.round(mFrame.getHeight()*ratio);
-            new_height = mFrame.getHeight();
-        }else{
-            new_width = mFrame.getWidth();
-            new_height = Math.round(mFrame.getWidth()/ratio);
-        }
-        mFrame.setLayoutParams(new FrameLayout.LayoutParams(new_width, new_height));
-        Log.d("=======MBT==>", "new:" + new_width + " x " + new_height);
+        setLayoutParams(new FrameLayout.LayoutParams((int)(480.0 * ratio), 480, Gravity.CENTER_VERTICAL));
+        //Log.d("=======MBT==>", "new:" + new_width + " x " + new_height);
 
         try {
             mCamera.setPreviewDisplay(holder);
