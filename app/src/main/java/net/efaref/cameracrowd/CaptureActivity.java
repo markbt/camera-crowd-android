@@ -70,29 +70,9 @@ public class CaptureActivity extends ActionBarActivity {
 
         // Create our Preview view and set it as the content of our activity.
         FrameLayout mFrame = (FrameLayout) findViewById(R.id.camera_preview);
-        mPreview = new CameraPreview(this, mCamera, mFrame);
+        mPreview = new CameraPreview(this, this, mCamera, mFrame);
 
         mFrame.addView(mPreview);
-
-        Camera.Size size = mCamera.getParameters().getPreviewSize();
-
-        //landscape
-        float ratio = (float)size.width/size.height;
-
-        //portrait
-        //float ratio = (float)size.height/size.width;
-
-        int new_width=0, new_height=0;
-        if(mFrame.getWidth()/mFrame.getHeight()<ratio){
-            new_width = Math.round(mFrame.getHeight()*ratio);
-            new_height = mFrame.getHeight();
-        }else{
-            new_width = mFrame.getWidth();
-            new_height = Math.round(mFrame.getWidth()/ratio);
-        }
-        mFrame.setLayoutParams(new FrameLayout.LayoutParams(new_width, new_height));
-        Log.d("=======MBT==>", "new:" + new_width + " x " + new_height);
-
 
         // Add a listener to the Capture button
         Button captureButton = (Button) findViewById(R.id.capture);
@@ -141,12 +121,17 @@ public class CaptureActivity extends ActionBarActivity {
         releaseCamera();              // release the camera immediately on pause event
     }
 
-    private void releaseCamera(){
+    private void releaseCamera() {
         if (mCamera != null){
             mCamera.release();        // release the camera for other applications
             mCamera = null;
             mPreview.cameraReleased();
         }
+    }
+
+    public Camera reopenCamera(){
+        mCamera = Camera.open();
+        return mCamera;
     }
 
     @Override

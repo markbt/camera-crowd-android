@@ -16,6 +16,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private FrameLayout mFrame;
+    private CaptureActivity mActivity;
 
     private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.05;
@@ -51,8 +52,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return optimalSize;
     }
 
-    public CameraPreview(Context context, Camera camera, FrameLayout frame) {
+    public CameraPreview(Context context, CaptureActivity activity, Camera camera, FrameLayout frame) {
         super(context);
+        mActivity = activity;
         mCamera = camera;
         mFrame = frame;
 
@@ -66,6 +68,29 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
+
+        if (mCamera == null) {
+            mCamera = mActivity.reopenCamera();
+        }
+
+        Camera.Size size = mCamera.getParameters().getPreviewSize();
+
+        //landscape
+        float ratio = (float)size.width/size.height;
+
+        //portrait
+        //float ratio = (float)size.height/size.width;
+
+        int new_width=0, new_height=0;
+        if(mFrame.getWidth()/mFrame.getHeight()<ratio){
+            new_width = Math.round(mFrame.getHeight()*ratio);
+            new_height = mFrame.getHeight();
+        }else{
+            new_width = mFrame.getWidth();
+            new_height = Math.round(mFrame.getWidth()/ratio);
+        }
+        mFrame.setLayoutParams(new FrameLayout.LayoutParams(new_width, new_height));
+        Log.d("=======MBT==>", "new:" + new_width + " x " + new_height);
 
         try {
             mCamera.setPreviewDisplay(holder);
