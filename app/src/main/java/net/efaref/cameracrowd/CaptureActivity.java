@@ -3,6 +3,9 @@ package net.efaref.cameracrowd;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -27,27 +30,40 @@ public class CaptureActivity extends ActionBarActivity {
 
     Camera mCamera;
     CameraPreview mPreview;
+
+    MediaPlayer _shootMP=null;
+
+    public void shootSound()
+    {
+        AudioManager meng = (AudioManager) this.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        int volume = meng.getStreamVolume( AudioManager.STREAM_NOTIFICATION);
+
+        if (volume != 0)
+        {
+            if (_shootMP == null)
+                _shootMP = MediaPlayer.create(this.getApplicationContext(), Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
+            if (_shootMP != null)
+                _shootMP.start();
+        }
+    }
+
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
 
         @Override
         public void onPictureTaken(final byte[] data, Camera camera) {
+            shootSound();
             new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] params) {
                     HttpClient client = new DefaultHttpClient();
                     HttpPost post = new HttpPost("http://212.13.201.166:10080/add");
                     try
-
                     {
                         StringEntity se = new StringEntity(Base64.encodeToString(data, Base64.DEFAULT));
                         post.setEntity(se);
                         client.execute(post);
                     }
-
-                    catch(
-                    Exception e
-                    )
-
+                    catch(Exception e)
                     {
                         Log.e("CameraCrowd", "Unexpected Exception", e);
                     }
