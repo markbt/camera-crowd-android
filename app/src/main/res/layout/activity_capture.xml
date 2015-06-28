@@ -52,4 +52,12 @@
         android:layout_toRightOf="@+id/camera_preview"
         android:layout_below="@+id/capture" />
 
+    <Space
+        android:layout_width="20px"
+        android:layout_height="20px"
+        android:layout_alignTop="@+id/logoView"
+        android:layout_centerHorizontal="true"
+        android:layout_toLeftOf="@+id/capture"
+        android:layout_toRightOf="@+id/camera_preview" />
+
 </RelativeLayout>
